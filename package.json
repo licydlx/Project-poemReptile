@@ -15,6 +15,7 @@
     "iconv-lite": "^0.4.15",
     "mkdirp": "^0.5.1",
     "mongoose": "^4.9.2",
+    "request": "^2.81.0",
     "request-promise": "^4.2.0",
     "superagent": "^3.0.0"
   },

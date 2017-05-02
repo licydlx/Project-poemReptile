@@ -24,6 +24,9 @@ var url = 'http://www.gushiwen.org/';
 
 function getChapter(i) {
     var i = i;
+    if (i > 11) {
+        return false;
+    }
     //爬取得朝代的总数
     var dynastyLength,
         //当前爬取得朝代
@@ -49,8 +52,6 @@ function getChapter(i) {
             dynasty = $('.main2 > .cont > a')[i].attribs.href.substring($('.main2 > .cont > a')[i].attribs.href.lastIndexOf('=') + 1);
             pageNum = i + 1;
             dynastyUrl = 'http://so.gushiwen.org/type.aspx?p=' + pageNum + '&c=' + dynasty + '';
-
-            console.log("第" + pageNum + "个朝代");
             //朝代页 返回值
             return [dynastyLength, dynasty, pageNum, dynastyUrl];
         }).then(function(value) {
@@ -58,10 +59,12 @@ function getChapter(i) {
             return rp(value[3]).then(function(body) {
                 var $ = cheerio.load(body);
                 var PoemListArray = [];
+                var sub;
                 PoemTotalNum = $('.typeleft .pages span:last-child').text();
                 PoemTotalLength = PoemTotalNum.substring(PoemTotalNum.indexOf('共') + 1, PoemTotalNum.indexOf('篇'));
-                for (var i = 0; i < 10; i++) {
-                    PoemListArray.push('http://so.gushiwen.org/type.aspx?p=' + value[2] + '&c=' + value[1] + '');
+                for (var i = 0; i < 6; i++) {
+                    sub = i + 1;
+                    PoemListArray.push('http://so.gushiwen.org/type.aspx?p=' + sub + '&c=' + value[1] + '');
                 }
                 // 返回值
                 return PoemListArray;
@@ -100,18 +103,16 @@ function getChapter(i) {
                     return poemPageAnalysis($);
                 }).then(function(value) {
                     // 返回值
-                    var test = PoemInfHan(value);
-                    console.log('===================test===========================');
-                    console.log(test);
                     return PoemInfHan(value);
                 });
             }, Promise.resolve());
         }).then(function(value) {
-            //生成Json
-            PoemStoreJson(value);
-            //下载图片
-            PoetImgDown(value);
-
+            if (value) {
+                //生成Json
+                PoemStoreJson(value);
+                //下载图片
+                PoetImgDown(value);
+            }
         }).then(function() {
             //下一个朝代,清空前一个朝代的数据
             OriginPoemUrlAr = [];
@@ -122,8 +123,6 @@ function getChapter(i) {
         }).catch(function(err) {
             console.log(err);
         });
-
-
 };
 
 getChapter(0);
